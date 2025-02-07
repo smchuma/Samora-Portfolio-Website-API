@@ -13,7 +13,7 @@ PORT = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: [process.env.DEVELOPMENT_URL, process.env.PRODUCTION_URL],
     credentials: true,
   })
 );
