@@ -79,10 +79,18 @@ const login = async (req, res) => {
 };
 
 const logout = async (req, res) => {
-  res.clearCookie("authToken");
-  res.status(200).json({
-    message: "Logout successfully",
-  });
+  try {
+    res.clearCookie("authToken");
+    res.status(200).json({
+      message: "Logout successfully",
+      success: true,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 const checkAuth = async (req, res) => {
