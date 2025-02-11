@@ -4,7 +4,6 @@ const authRoutes = require("./routes/auth.route");
 const connectDB = require("./db/connectDB");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const userRoutes = require("./routes/user.route");
 
 dotenv.config();
 
@@ -23,7 +22,6 @@ app.use(cookieParser()); //parse cookies
 
 // routes
 app.use("/api/auth", authRoutes);
-app.use("/api/", userRoutes);
 
 app.listen(PORT, () => {
   connectDB();
