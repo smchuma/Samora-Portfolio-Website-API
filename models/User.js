@@ -25,6 +25,27 @@ const userSchema = new mongoose.Schema(
       min: 10,
       unique: true,
     },
+
+    // experience: [
+    //   {
+    //     company: String,
+    //     role: String,
+    //     start_date: String,
+    //     end_date: String,
+    //     description: String,
+    //   },
+    // ],
+
+    // projects: [
+    //   {
+    //     title: String,
+    //     description: String,
+    //     link: String,
+    //   },
+    // ],
+
+    // skills: [String]
+
     profession: String,
     location: String,
     about_me: String,
