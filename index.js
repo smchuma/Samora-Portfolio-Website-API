@@ -1,9 +1,11 @@
+const authRoutes = require("./routes/auth.route");
+const adminRoutes = require("./routes/admin.route");
+const portfolioRoutes = require("./routes/portfolio.route");
+const cookieParser = require("cookie-parser");
+const connectDB = require("./db/connectDB");
 const express = require("express");
 const dotenv = require("dotenv");
-const authRoutes = require("./routes/auth.route");
-const connectDB = require("./db/connectDB");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
 
 dotenv.config();
 
@@ -22,6 +24,8 @@ app.use(cookieParser()); //parse cookies
 
 // routes
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/portfolio", portfolioRoutes);
 
 app.listen(PORT, () => {
   connectDB();

@@ -3,10 +3,24 @@ const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
 
 const register = async (req, res) => {
-  const { first_name, last_name, email, password, phone_number } = req.body;
+  const {
+    username,
+    email,
+    password,
+    personal_details: { first_name, middle_name, last_name, phone_number },
+  } = req.body;
 
   try {
-    if (!first_name || !last_name || !email || !password || !phone_number) {
+    console.log("req.body", req.body);
+    if (
+      !username ||
+      !first_name ||
+      !middle_name ||
+      !last_name ||
+      !email ||
+      !password ||
+      !phone_number
+    ) {
       throw new Error("All fiends are required");
     }
 
@@ -22,11 +36,15 @@ const register = async (req, res) => {
     const hashedPassword = await bcryptjs.hash(password, 10);
 
     await User.create({
-      first_name,
-      last_name,
+      username,
       email,
       password: hashedPassword,
-      phone_number,
+      personal_details: {
+        first_name,
+        middle_name,
+        last_name,
+        phone_number,
+      },
     });
 
     res.status(201).json({
@@ -42,15 +60,21 @@ const register = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { username, email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email });
+    if (!username && !email) {
+      return res.status(400).json({ message: "Username or email is required" });
+    }
+
+    const user = await User.findOne({
+      $or: [{ username }, { email }],
+    });
 
     if (!user) {
       return res.status(400).json({
         success: false,
-        message: "User not found with this email",
+        message: "User not found",
       });
     }
 
@@ -115,99 +139,73 @@ const checkAuth = async (req, res) => {
   }
 };
 
-const updateUser = async (req, res) => {
-  const id = req.params.id;
+// const updateUser = async (req, res) => {
+//   const id = req.params.id;
 
-  try {
-    if (!req.userId || req.userId !== id) {
-      return res.status(400).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
+//   try {
+//     if (!req.userId || req.userId !== id) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Unauthorized",
+//       });
+//     }
 
-    if (!req.body) {
-      return res.status(400).json({
-        success: false,
-        message: "No data provided",
-      });
-    }
+//     if (!req.body) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "No data provided",
+//       });
+//     }
 
-    if (req.body.password) {
-      return res.status(400).json({
-        success: false,
-        message: "Cannot update password",
-      });
-    }
+//     if (req.body.password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Cannot update password",
+//       });
+//     }
 
-    if (req.body.email) {
-      return res.status(400).json({
-        success: false,
-        message: "Cannot update email",
-      });
-    }
+//     if (req.body.email) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Cannot update email",
+//       });
+//     }
 
-    if (req.body.phone_number) {
-      return res.status(400).json({
-        success: false,
-        message: "Cannot update phone number",
-      });
-    }
+//     if (req.body.phone_number) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Cannot update phone number",
+//       });
+//     }
 
-    const user = await User.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+//     const user = await User.findByIdAndUpdate(id, req.body, {
+//       new: true,
+//       runValidators: true,
+//     });
 
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-    res.status(200).json({
-      success: true,
-      message: "User updated successfully",
-      user,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
-
-const getMyPortfolioDetails = async (req, res) => {
-  try {
-    const userId = process.env.USER_ID;
-
-    const user = await User.findById(userId).select("-password");
-
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      user,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+//     if (!user) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     }
+//     res.status(200).json({
+//       success: true,
+//       message: "User updated successfully",
+//       user,
+//     });
+//   } catch (error) {
+//     res.status(400).json({
+//       success: false,
+//       message: error.message,
+//     });
+//   }
+// };
 
 module.exports = {
   register,
   login,
   logout,
   checkAuth,
-  updateUser,
-  getMyPortfolioDetails,
+  // updateUser,
 };
